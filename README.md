@@ -17,5 +17,8 @@ Key steps in setting up this Leaflet mapping project:
   - Use addTo to connect the pieces where you want them to go, on various maps or layers
   
      
+     Here's what my map should look like when it first loads:
+     
+     ![map load image](https://github.com/mgsrichard/Mapping_Earthquakes/blob/main/Earthquake_Challenge/Load%20image.png)
  
   
