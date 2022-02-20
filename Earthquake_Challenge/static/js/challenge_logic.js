@@ -31,13 +31,15 @@ let baseMaps = {
 // 1. Add a 2nd layer group for the tectonic plate data.
 let allEarthquakes = new L.LayerGroup();
 let tectonicPlates = new L.LayerGroup();
+let majorEQ = new L.LayerGroup();
 
 
 
 // 2. Add a reference to the tectonic plates group to the overlays object.
 let overlays = {
   "Earthquakes": allEarthquakes,
-  "Tectonic Plates": tectonicPlates
+  "Tectonic Plates": tectonicPlates,
+  "Major Earthquakes": majorEQ
 };
 
 // Then we add a control to the map that will allow the user to change which
@@ -61,6 +63,7 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geoj
       weight: 0.5
     };
   }
+  
 
   // This function determines the color of the marker based on the magnitude of the earthquake.
   function getColor(magnitude) {
@@ -82,6 +85,8 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geoj
     return "#98ee00";
   }
 
+  
+
   // This function determines the radius of the earthquake marker based on its magnitude.
   // Earthquakes with a magnitude of 0 were being plotted with the wrong radius.
   function getRadius(magnitude) {
@@ -90,6 +95,8 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geoj
     }
     return magnitude * 4;
   }
+
+
 
   // Creating a GeoJSON layer with the retrieved data.
   L.geoJson(data, {
@@ -109,6 +116,74 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geoj
 
   // Then we add the earthquake layer to our map.
   allEarthquakes.addTo(map);
+//---------------------------------deliverable 2----------------------------------------------------------
+
+// 3. Retrieve the major earthquake GeoJSON data >4.5 mag for the week.
+d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson").then(function(data) {
+  
+    
+
+
+
+  // 4. Use the same style as the earthquake data.
+  //This function sets the style differently for the earthquakes in the Major Earthquakes overlay
+  function styleInfoMajorEQ(feature) {
+    return {
+      opacity: 1,
+      fillOpacity: 1,
+      fillColor: getColor2(feature.properties.mag),
+      color: "#000000",
+      radius: getRadius(feature.properties.mag),
+      stroke: true,
+      weight: 0.5
+    };
+  }
+  
+  // 5. Change the color function to use three colors for the major earthquakes based on the magnitude of the earthquake.
+  // This function determines the color of the marker based on the magnitude of the earthquake for major earthquakes.
+  function getColor2(magnitude) {
+    if (magnitude > 6) {
+      return "#9400d1"
+    }
+    if (magnitude > 5) {
+      return "#ea2c2c";
+    }
+    if (magnitude <=5) {
+      return "#ea822c";
+    }
+  }
+  
+  // 6. Use the function that determines the radius of the earthquake marker based on its magnitude. - call getRadius
+  
+  // 7. Creating a GeoJSON layer with the retrieved data that adds a circle to the map 
+  // sets the style of the circle, and displays the magnitude and location of the earthquake
+  //  after the marker has been created and styled.
+  
+
+  L.geoJson(data, {
+    pointToLayer: function(feature, latlng) {
+      if (feature.properties.mag > 4.5) {
+      console.log(feature.properties.mag);
+      return L.circleMarker(latlng);
+      }
+    },
+    style: styleInfoMajorEQ,
+    onEachFeature: function(feature, layer) {
+      layer.bindPopup("Magnitude: " + feature.properties.mag + "<br>Location: " + feature.properties.place);
+    }
+    
+  }).addTo(majorEQ);
+
+
+  // 8. Add the major earthquakes layer to the map.
+    majorEQ.addTo(map);
+  // 9. Close the braces and parentheses for the major earthquake data.
+  });
+
+
+
+
+
 
   // Here we create a legend control object.
 let legend = L.control({
@@ -146,7 +221,7 @@ legend.onAdd = function() {
   // 3. Use d3.json to make a call to get our Tectonic Plate geoJSON data.
   let tectonicData = "https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_boundaries.json"
   d3.json(tectonicData,).then(function(data) {
-    console.log(data);
+    //console.log(data);
     //Creating a GeoJSON layer with the retrieved data
   L.geoJSON(data, {
     color:"#ff0000",
