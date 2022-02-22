@@ -36,14 +36,14 @@ let baseMaps = {
   "Dark": dark
 };
 
-// 1. Add a 2nd layer group for the tectonic plate data.
+// 1. Add a 2nd layer group for the tectonic plate data, and a third layer for the major earthquakes
 let allEarthquakes = new L.LayerGroup();
 let tectonicPlates = new L.LayerGroup();
 let majorEQ = new L.LayerGroup();
 
 
 
-// 2. Add a reference to the tectonic plates group to the overlays object.
+// 2. Add a reference to the tectonic plates and major earthquakes groups to the overlays object.
 let overlays = {
   "Earthquakes": allEarthquakes,
   "Tectonic Plates": tectonicPlates,
@@ -73,8 +73,13 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geoj
   }
   
 
-  // This function determines the color of the marker based on the magnitude of the earthquake.
+  // This function determines the color of the marker based on the magnitude of the earthquake. I added a >6 range
+  // so that this one function could work for the earthquake layer and the major earthquake layer, and then the
+  //two layers are consistent when viewed separately or together
   function getColor(magnitude) {
+    if (magnitude > 6) {
+      return "#9400d1";
+    }
     if (magnitude > 5) {
       return "#ea2c2c";
     }
@@ -114,12 +119,12 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geoj
       		return L.circleMarker(latlng);
         },
       // We set the style for each circleMarker using our styleInfo function.
-    style: styleInfo,
-     // We create a popup for each circleMarker to display the magnitude and location of the earthquake
-     //  after the marker has been created and styled.
-     onEachFeature: function(feature, layer) {
-      layer.bindPopup("Magnitude: " + feature.properties.mag + "<br>Location: " + feature.properties.place);
-    }
+      style: styleInfo,
+      // We create a popup for each circleMarker to display the magnitude and location of the earthquake
+      //  after the marker has been created and styled.
+      onEachFeature: function(feature, layer) {
+        layer.bindPopup("Magnitude: " + feature.properties.mag + "<br>Location: " + feature.properties.place);
+      }
   }).addTo(allEarthquakes);
 
   // Then we add the earthquake layer to our map.
@@ -128,40 +133,18 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geoj
 
 // 3. Retrieve the major earthquake GeoJSON data >4.5 mag for the week.
 d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson").then(function(data) {
-  
-    
 
-
-
-  // 4. Use the same style as the earthquake data.
-  //This function sets the style differently for the earthquakes in the Major Earthquakes overlay
-  function styleInfoMajorEQ(feature) {
-    return {
-      opacity: 1,
-      fillOpacity: 1,
-      fillColor: getColor2(feature.properties.mag),
-      color: "#000000",
-      radius: getRadius(feature.properties.mag),
-      stroke: true,
-      weight: 0.5
-    };
-  }
-  
+  // 4. Use the same style as the earthquake data - use styleInfo function from above
+ 
   // 5. Change the color function to use three colors for the major earthquakes based on the magnitude of the earthquake.
   // This function determines the color of the marker based on the magnitude of the earthquake for major earthquakes.
-  function getColor2(magnitude) {
-    if (magnitude > 6) {
-      return "#9400d1"
-    }
-    if (magnitude > 5) {
-      return "#ea2c2c";
-    }
-    if (magnitude <=5) {
-      return "#ea822c";
-    }
-  }
-  
-  // 6. Use the function that determines the radius of the earthquake marker based on its magnitude. - call getRadius
+  //---I did this by simply adding a >6 range on the original getColor function, it makes the two earthquake layers consistent 
+  //with each other, and when the major earthquakes overlay is the only one toggled on it will only have the top three colors 
+  //(for magnitudes 4,5,6+) anyway since we are excluding any earthquakes below a magnitude of 4.5
+
+
+  // 6. Use the function that determines the radius of the earthquake marker based on its magnitude. - call getRadius. Nothing
+  //I can see in the instructions says to make the radius different here
   
   // 7. Creating a GeoJSON layer with the retrieved data that adds a circle to the map 
   // sets the style of the circle, and displays the magnitude and location of the earthquake
@@ -175,7 +158,7 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geoj
       return L.circleMarker(latlng);
       }
     },
-    style: styleInfoMajorEQ,
+    style: styleInfo,
     onEachFeature: function(feature, layer) {
       layer.bindPopup("Magnitude: " + feature.properties.mag + "<br>Location: " + feature.properties.place);
     }
@@ -193,7 +176,7 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geoj
 
 
 
-  // Here we create a legend control object.
+  // Here we create a legend control object. Note, I added a sixth color to reflect the addition to the markers for magnitude 6+
 let legend = L.control({
   position: "bottomright"
 });
@@ -202,14 +185,15 @@ let legend = L.control({
 legend.onAdd = function() {
   let div = L.DomUtil.create("div", "info legend");
 
-  const magnitudes = [0, 1, 2, 3, 4, 5];
+  const magnitudes = [0, 1, 2, 3, 4, 5, 6];
   const colors = [
     "#98ee00",
     "#d4ee00",
     "#eecc00",
     "#ee9c00",
     "#ea822c",
-    "#ea2c2c"
+    "#ea2c2c",
+    "#9400d1"
   ];
 
 // Looping through our intervals to generate a label with a colored square for each interval.
@@ -235,7 +219,7 @@ legend.onAdd = function() {
     color:"#ff0000",
     weight: 2
   }).addTo(tectonicPlates)
-  // Then we add the tecetonic plates layer to our map.
+  // Then we add the tectonic plates layer to our map.
   tectonicPlates.addTo(map);
 
 
