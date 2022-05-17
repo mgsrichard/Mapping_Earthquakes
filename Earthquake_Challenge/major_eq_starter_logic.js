@@ -81,7 +81,7 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geoj
   }
 
   // This function determines the radius of the earthquake marker based on its magnitude.
-  // Earthquakes with a magnitude of 0 were being plotted with the wrong radius.
+
   function getRadius(magnitude) {
     if (magnitude === 0) {
       return 1;
