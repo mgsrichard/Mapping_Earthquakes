@@ -22,7 +22,7 @@ Key steps in setting up this Leaflet mapping project:
       - Call GeoJson to get the data set the way you want for the map. Use pointToLayer and onEachFeature to loop through GeoJson geometry data points and put them on the map, using L.marker() or L.circleMarker to create a marker for point data. Use .bindPopup to make a popup appear on each feature with the info you want, coding it in "" with html inside the function
       - Use addTo to connect the pieces where you want them to go, on various maps or layers
   
-###Images of JavaScript coding
+### Images of JavaScript coding
 ![logic1](https://github.com/mgsrichard/Mapping_Earthquakes/blob/main/Earthquake_Challenge/images/Logic1.png)
 ![logic2](https://github.com/mgsrichard/Mapping_Earthquakes/blob/main/Earthquake_Challenge/images/Logic2.png)
 ![logic3](https://github.com/mgsrichard/Mapping_Earthquakes/blob/main/Earthquake_Challenge/images/Logic3.png)
